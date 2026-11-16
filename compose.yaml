@@ -1,0 +1,41 @@
+services:
+  app:
+    build: ./docker
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_NAME: tasktrack
+      DB_USER: tasktrack
+      DB_PASSWORD: tasktrack_local
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_DATABASE: tasktrack
+      MARIADB_USER: tasktrack
+      MARIADB_PASSWORD: tasktrack_local
+      MARIADB_ROOT_PASSWORD: root_local
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/002-category-ownership.sql:/docker-entrypoint-initdb.d/02-category-ownership.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  phpmyadmin:
+    image: phpmyadmin:5
+    ports:
+      - "127.0.0.1:8081:80"
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
+volumes:
+  db_data:

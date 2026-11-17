@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Animasi belajar</title>
+</head>
+<body>
+  <h1>Animasi frame</h1>
+  <p>Tekan mulai untuk menggerakkan titik; hentikan untuk menjeda.</p>
+  <canvas id="canvas" width="400" height="100" aria-label="Animasi titik bergerak"></canvas>
+  <p>
+    <button id="start">Mulai</button>
+    <button id="stop">Berhenti</button>
+  </p>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let x = 10;
+    let frame = null;
+    let previous = 0;
+
+    function draw(time) {
+      if (previous) {
+        x = (x + (time - previous) * 0.08) % canvas.width;
+      }
+      previous = time;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#176852';
+      ctx.beginPath();
+      ctx.arc(x, 50, 10, 0, 2 * Math.PI);
+      ctx.fill();
+      frame = requestAnimationFrame(draw);
+    }
+
+    document.getElementById('start').onclick = () => {
+      if (frame === null) {
+        frame = requestAnimationFrame(draw);
+      }
+    };
+
+    document.getElementById('stop').onclick = () => {
+      cancelAnimationFrame(frame);
+      frame = null;
+      previous = 0;
+    };
+  </script>
+</body>
+</html>

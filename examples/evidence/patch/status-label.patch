@@ -1,0 +1,9 @@
+--- label.php
++++ label.php
+@@ -8,5 +8,6 @@
+         'todo' => 'Belum dikerjakan',
+         'doing' => 'Dikerjakan',
+         'done' => 'Selesai',
++        default => 'Status tidak dikenal',
+     };
+ }

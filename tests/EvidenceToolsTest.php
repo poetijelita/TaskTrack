@@ -10,6 +10,28 @@ use TaskTrack\ResourceReport;
 
 final class EvidenceToolsTest extends TestCase
 {
+    public function testMigrationRejectsUnknownStatusWithoutOverwritingOutput(): void
+    {
+        $source = tempnam(sys_get_temp_dir(), 'csv-');
+        $target = tempnam(sys_get_temp_dir(), 'json-');
+        self::assertIsString($source);
+        self::assertIsString($target);
+        try {
+            file_put_contents($source, "title,status\nContoh,unknown\n");
+            file_put_contents($target, 'original');
+            try {
+                CsvMigration::migrate($source, $target);
+                self::fail('Status tidak valid harus ditolak');
+            } catch (\RuntimeException $error) {
+                self::assertSame('Status tugas tidak valid.', $error->getMessage());
+                self::assertSame('original', file_get_contents($target));
+            }
+        } finally {
+            unlink($source);
+            unlink($target);
+        }
+    }
+
     public function testMigratesCsvIntoJsonWithoutLosingUnicode(): void
     {
         self::assertTrue(class_exists(CsvMigration::class));

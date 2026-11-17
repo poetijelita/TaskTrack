@@ -24,6 +24,9 @@ final class CsvMigration
                 if (count($row) !== 2 || !is_string($row[0]) || !is_string($row[1])) {
                     throw new RuntimeException('Baris CSV tidak valid.');
                 }
+                if (!in_array($row[1], ['todo', 'doing', 'done'], true)) {
+                    throw new RuntimeException('Status tugas tidak valid.');
+                }
                 $tasks[] = ['title' => $row[0], 'status' => $row[1]];
             }
             TaskFile::write($target, $tasks);
